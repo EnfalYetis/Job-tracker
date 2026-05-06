@@ -1,5 +1,6 @@
 const express=require('express');
 const router = express.Router();
+const {validateApplicationName,validateId}=require('../middlewares/validateApplication');
 
 const {
   getApplication,
@@ -10,9 +11,9 @@ const {
 } = require('../controllers/applicationController');
 
 router.get('/',getApplication);
-router.post('/',createApplication);
-router.get('/:id',getApplicationById);
-router.delete('/:id',deleteApplication);
-router.put('/:id',updateApplication);
+router.post('/',validateApplicationName,createApplication);
+router.get('/:id',validateId,getApplicationById);
+router.delete('/:id',validateId,deleteApplication);
+router.put('/:id',validateId,validateApplicationName,updateApplication);
 
 module.exports = router;
