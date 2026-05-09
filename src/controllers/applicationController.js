@@ -1,4 +1,6 @@
 const pool = require('../db');
+const applicationService = require('../services/applicationService');
+
 //GET METODU
 exports.getApplication=async (req,res)=>{
   try{
@@ -7,12 +9,10 @@ exports.getApplication=async (req,res)=>{
     const limitNum = parseInt(limit)||10; //string geldikleri için numbera çevirdik
     const offsetNum = parseInt(offset)||0;
     
-    const result = await pool.query(
-    'SELECT * FROM applications ORDER BY id LIMIT $1 OFFSET $2',
-  [limitNum,offsetNum]);
+    const result=await applicationService.getApplications(limitNum,offsetNum);
 
-  res.status(200).json(result.rows);
-  }
+    res.status(200).json(result);
+    }
   catch{
     res.status(500).json({error:"server error"});
   }
@@ -22,40 +22,31 @@ exports.getApplication=async (req,res)=>{
 //POST METODU
 exports.createApplication=async (req,res)=>{
     const {name} =req.body;
+    const result=await applicationService.createApplication(name);
 
-    const result = await pool.query(
-    'INSERT INTO applications (name) VALUES ($1) RETURNING id,name',
-    [name]
-  );
-
-  res.status(201).json(result.rows[0]);
+    res.status(201).json(result);
 }
 
 exports.getApplicationById=async (req,res)=>{
   const id=parseInt(req.params.id);
-
-  const result=await pool.query(
-    'SELECT * FROM applications WHERE id=$1',[id]);
   
-  if(result.rows.length===0){
+  const result=await applicationService.getApplicationById(id);
+
+  if(!result){
     return res.status(404).send('application not found');
   }
-  else{
-    return res.json(result.rows[0]);
-  }
+    return res.json(result);
+  
 }
 //DELETE METODU
 exports.deleteApplication=async(req,res)=>{
   const id=parseInt(req.params.id);
-  
-  const result=await pool.query(
-    'DELETE FROM applications WHERE id=$1 RETURNING id,name',[id]);
+  const result=await applicationService.deleteApplication(id);
 
-  if(result.rowCount===0){
+  if(!result){
     return res.status(404).send("Application not found");
   }
-  
-  res.status(200).json(result.rows[0]);
+  res.status(200).json(result);
 
 }
 //PUT METODU
@@ -63,12 +54,10 @@ exports.updateApplication=async(req,res)=>{
   const id=parseInt(req.params.id);
   const {name}=req.body;
 
-  const result= await pool.query(
-    'UPDATE applications SET name=$1 WHERE id=$2 RETURNING id,name',
-    [name,id]
-  )
-  if(result.rowCount===0){
+  const result=await applicationService.updateApplication({id,name});
+
+  if(!result){
     return res.status(404).send("application not found");
   }
-  res.status(200).json(result.rows[0]);
+  res.status(200).json(result);
 }
