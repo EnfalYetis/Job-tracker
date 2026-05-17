@@ -24,4 +24,7 @@ exports.validateId = (id) => {
     if (isNaN(id)) {
         throw new AppError("id sayı olmalı", 400);
     }
+    if (id === undefined || id === null) {
+        throw new AppError("id zorunlu", 400);
+    }
 };

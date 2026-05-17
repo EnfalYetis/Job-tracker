@@ -1,4 +1,6 @@
-const applicationRepository=require('../src/repositories/applcaitonRepository.js');
+const applicationRepository=require('../repositories/applicationRepository.js');
+const AppError = require('../utils/AppError');
+const {validateId,validateName}=require("../validations/applicationValidation.js");
 
 exports.getApplications=async(limitNum,offsetNum)=>{
 
@@ -7,43 +9,55 @@ exports.getApplications=async(limitNum,offsetNum)=>{
 }
 exports.getApplicationById=async(id)=>{
 
-    const result=await applicationRepository.getApplicationById(id);
+    validateId(id);
 
-    if(!result){
-        return null;
+    const result = await applicationRepository.getApplicationById(id);
+
+    if (!result) {
+        throw new AppError("Application bulunamadı", 404);
     }
-    return result;
+
+    return result
+;
 
 }
 
 exports.createApplication=async(name)=>{
 
+    validateName(name);
+
     return applicationRepository.createApplication(name);
+
 }
 
 exports.deleteApplication=async(id)=>{
 
-    const result=await applicationRepository.deleteApplication(id);
+    validateId(id);
 
-    if(!result){
-        return null;
+    const result = await applicationRepository.deleteApplication(id);
+
+    if (!result) {
+        throw new AppError("Application bulunamadı", 404);
     }
+
     return result;
+
+    
     
 }
 
 exports.updateApplication=async({id,name})=>{
 
-    const result=await applicationRepository.updateApplication(id,name); 
+    validateName(name);
+    validateId(id);
 
-    
-    if(!result){
+    const result = await applicationRepository.updateApplication(id, name);
 
-    const error = new Error("Application bulunamadı");
-    error.statusCode = 404;
-    throw error;
-  }
-   return result;
+    if (!result) {
+        throw new AppError("Application bulunamadı", 404);
+    }
+
+    return result;
 
   
 }

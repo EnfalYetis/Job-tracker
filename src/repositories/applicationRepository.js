@@ -26,7 +26,6 @@ exports.deleteApplication=async(id)=>{
     const result=await pool.query(
     'DELETE FROM applications WHERE id=$1 RETURNING id,name',[id]);
 
-
     return result.rows[0];
 
 }
